@@ -3,8 +3,13 @@ package com.example;
 import org.apache.coyote.Response;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.function.EntityResponse;
 
 import com.example.DatabaseManager;
 
@@ -17,6 +22,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.URI;
 import java.time.LocalDate; 
  
 
@@ -32,42 +38,32 @@ public class MyApplication {
 		return "Hello World!";
 	}
 
+
 	@RequestMapping("/reports")
-	String allReports(){
-
+	public ResponseEntity requestMethodName() {
+		
 		List<Report> reportList = db.getAllReports();
-		System.out.println(reportList);
+		return ResponseEntity.created(
+			URI.create("/reports/all"))
+			.body(reportList);
 
-		String json = null; 
 
-		ObjectMapper om = new ObjectMapper();
-
-		try{
-			json = om.writeValueAsString(reportList);
-		}
-		catch (Exception e){
-			System.out.println(e);
-		}
-
-		System.out.println(json);
-		return json; 
-
-		
-		
 	}
 
-	@RequestMapping("/post")
-	public void InsertReport() {
 
-		Report test = new Report();
+	@PostMapping("/post")
+	public ResponseEntity<Report> postMethodName(@RequestBody Report report) {
 		
-		test.setBody("Henry Buys a bean 3");
-        test.setDateNow();
-        test.setUser("Henry but not real");
+		//Saves report to database
+		db.saveReport(report);
 
+		//Returns ResponseEntity
+		return ResponseEntity.created(
+			URI.create(String.format("/post/%d", report.getID())))
+			.body(report);
 
-		db.saveReport(test);
 	}
+	
 	
 
 

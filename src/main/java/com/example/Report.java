@@ -70,6 +70,10 @@ public class Report {
         
     }
 
+    public int getID(){
+      return this.id; 
+    }
+
     @Override
     public String toString(){
         return this.id + " " + this.date.toString() + " " + this.user + " " + this.body;
